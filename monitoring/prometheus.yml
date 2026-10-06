@@ -5,4 +5,4 @@ scrape_configs:
   - job_name: "cadvisor"
     static_configs:
       - targets:
-          - "cadvisor:8085"
+          - "cadvisor:8080"
