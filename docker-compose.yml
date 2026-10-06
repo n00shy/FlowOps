@@ -1,5 +1,3 @@
-
-
 services:
   # ─── MongoDB ────────────────────────────────────────────────────────────────
   mongo:
@@ -38,7 +36,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./backend/src:/app/src  # Hot reload in dev
+      - ./backend/src:/app/src
 
   # ─── Frontend ───────────────────────────────────────────────────────────────
   frontend:
@@ -55,32 +53,32 @@ services:
     ports:
       - "3005:80"
 
+  # ─── Prometheus ─────────────────────────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus
+    container_name: dataflow-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    networks:
+      - dataflow-net
+
+  # ─── Grafana ───────────────────────────────────────────────────────────────
+  grafana:
+    image: grafana/grafana
+    container_name: dataflow-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - dataflow-net
+
 volumes:
   mongo_data:
     driver: local
 
-networks:
-  dataflow-net:
-    driver: bridge
-
-# ─── monitor ───────────────────────────────────────────────────────────────
-
-prometheus:
-  image: prom/prometheus
-  container_name: dataflow-prometheus
-  ports:
-    - "9090:9090"
-  networks:
-    - dataflow-net
-grafana:
-  image: grafana/grafana
-  container_name: dataflow-grafana
-  ports:
-    - "3001:3000"
-  depends_on:
-    - prometheus
-  networks:
-    - dataflow-net
 networks:
   dataflow-net:
     driver: bridge
