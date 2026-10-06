@@ -23,6 +23,29 @@ pipeline {
             }
         }
 
+        stage('Prepare Runtime Secrets') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'dataflow-jwt-secret', variable: 'JWT_SECRET'),
+                    string(credentialsId: 'dataflow-jwt-refresh-secret', variable: 'JWT_REFRESH_SECRET')
+                ]) {
+                    sh '''
+                        umask 077
+                        cat > backend/.env <<EOF
+NODE_ENV=production
+PORT=5000
+MONGODB_URI=mongodb://mongo:27017/dataflow
+JWT_SECRET=$JWT_SECRET
+JWT_EXPIRES_IN=15m
+JWT_REFRESH_SECRET=$JWT_REFRESH_SECRET
+JWT_REFRESH_EXPIRES_IN=7d
+FRONTEND_URL=http://localhost:3000
+EOF
+                    '''
+                }
+            }
+        }
+
         stage('Build Images') {
             steps {
                 sh '''
@@ -75,7 +98,6 @@ pipeline {
                 sh '''
                     docker push ${DOCKER_USER}/dataflow-backend:${IMAGE_TAG}
                     docker push ${DOCKER_USER}/dataflow-backend:latest
-
                     docker push ${DOCKER_USER}/dataflow-frontend:${IMAGE_TAG}
                     docker push ${DOCKER_USER}/dataflow-frontend:latest
                 '''
@@ -96,9 +118,8 @@ pipeline {
                 sh '''
                     docker compose ps
                     docker ps
-
-                    curl -f http://localhost:5000 || true
-                    curl -f http://localhost:3000 || true
+                    curl -f http://localhost:5000/api/health
+                    curl -f http://localhost:3000
                 '''
             }
         }
@@ -111,18 +132,15 @@ pipeline {
                 docker system df
             '''
         }
-
         cleanup {
             sh '''
                 docker image prune -af || true
                 docker builder prune -af || true
             '''
         }
-
         success {
             echo '✅ Pipeline completed successfully.'
         }
-
         failure {
             echo '❌ Pipeline failed.'
         }
