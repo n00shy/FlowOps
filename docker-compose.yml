@@ -20,7 +20,7 @@ services:
 
   # ─── Backend API ────────────────────────────────────────────────────────────
   backend:
-    image: abdullahahmed1101076/dataflow-backend:latest
+    image: n00shy/dataflow-backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -42,7 +42,7 @@ services:
 
   # ─── Frontend ───────────────────────────────────────────────────────────────
   frontend:
-    image: abdullahahmed1101076/dataflow-frontend:latest
+    image: n00shy/dataflow-frontend:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
