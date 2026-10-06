@@ -77,15 +77,7 @@ services:
     networks:
       - dataflow-net
 
-volumes:
-  mongo_data:
-    driver: local
-
-networks:
-  dataflow-net:
-    driver: bridge
-
-  # ─── cAdvisor ──────────────────────────────────────────────────────────────
+ # ─── cAdvisor ──────────────────────────────────────────────────────────────
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: dataflow-cadvisor
@@ -99,3 +91,13 @@ networks:
       - /var/lib/docker:/var/lib/docker:ro
     networks:
       - dataflow-net
+
+volumes:
+  mongo_data:
+    driver: local
+
+networks:
+  dataflow-net:
+    driver: bridge
+
+ 
