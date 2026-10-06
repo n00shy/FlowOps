@@ -53,7 +53,7 @@ services:
     networks:
       - dataflow-net
     ports:
-      - "3000:80"
+      - "3005:80"
 
 volumes:
   mongo_data:
@@ -65,25 +65,22 @@ networks:
 
 # ─── monitor ───────────────────────────────────────────────────────────────
 
-services:
-  prometheus:
-    image: prom/prometheus
-    container_name: dataflow-prometheus
-    ports:
-      - "9090:9090"
-    networks:
-      - dataflow-net
-
-  grafana:
-    image: grafana/grafana
-    container_name: dataflow-grafana
-    ports:
-      - "3001:3000"
-    depends_on:
-      - prometheus
-    networks:
-      - dataflow-net
-
+prometheus:
+  image: prom/prometheus
+  container_name: dataflow-prometheus
+  ports:
+    - "9090:9090"
+  networks:
+    - dataflow-net
+grafana:
+  image: grafana/grafana
+  container_name: dataflow-grafana
+  ports:
+    - "3001:3000"
+  depends_on:
+    - prometheus
+  networks:
+    - dataflow-net
 networks:
   dataflow-net:
     driver: bridge
